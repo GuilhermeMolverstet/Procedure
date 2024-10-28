@@ -1,0 +1,229 @@
+																					
+																		DESAFIO PROCEDURE	
+
+
+O que é e para que server uma PK (PRIMARY KEY)?
+	A primary key, é a chave primaria aquela que ira ser o identificador unico de uma tabela
+	
+O que a instrução (NOT NULL) faz?
+	Not Null proibe alguma declaração de valores nulos em uma coluna especifica 
+
+O que é e para que server uma constraint?
+	O constraint é uma aplicação em uma ou mais colunas de uma tabela para impor restrições aos dados que podem ser inseridos ou modificados
+	
+O que é e para que serve DBMS_OUTPUT.PUT_LINE
+	O DBMS_OUTPUT é um pacote que permite exibir informações e mesagens colocadas, capturar saidas de um SQL
+	
+O que é e para que serve SET SERVEROUTPUT
+	O SET SERVEROUTPUT ele ira especificar se a saida de uma mensagem do DBMS_OUTPUT é redirecionada para uma saida padrão ou não
+	
+	
+																		EXERCIO 1
+	Scripts
+Apos der criado uma tabela 
+
+	CREATE TABLE ESTAGIO(
+	ID NUMBER(4) PRIMARY KEY, 
+	NOME VARCHAR2(120) NOT NULL,
+	CONSTRAINT UQ_NOME_ESTAGIO UNIQUE (NOME)
+	);
+	INSERT INTO ESTAGIO (ID, NOME) VALUES (1, 'AlessandroExi Gru');
+	INSERT INTO ESTAGIO (ID, NOME) VALUES (2, 'Alemao');
+	INSERT INTO ESTAGIO (ID, NOME) VALUES (3, 'Joao');
+	INSERT INTO ESTAGIO (ID, NOME) VALUES (4, 'Amanda');
+	INSERT INTO ESTAGIO (ID, NOME) VALUES (5, 'Unknown');
+	COMMIT;
+
+ira aparecer que a tabela foi criada 
+	"table created"
+	
+e as linhas inseritas
+	"1 row created"
+	
+se quiser ver se foi criado a tabela selecione ela
+	"select *
+	from ESTAGIO"
+	
+e se for adicionado ira vim com as colunas "feias" e voce pode arrumar
+	"col NOME for a50 
+	/" - aqui nesse Script ele ira arrumar a coluna NOME em até 50 caracteries para o lado
+	
+	
+	
+																Criação de uma PROCEDURE
+																
+CREATE OR REPLACE PROCEDURE COD_ESTAGIARIO (c_id IN ESTAGIO.ID%TYPE, c_saida OUT VARCHAR2) AS --> ira criar uma procedure com o nome 'COD_ESTAGIARIO' que o c_id ira ser o identificador da minha coluna 'ESTAGIO' e ira der uma variavel c_saida que ira armazenar caso algum estagiario não for encontrado
+BEGIN 														--> aqui ira comecar o 'corpo' da nossa procedure
+    SELECT NOME INTO c_saida 								--> uma variavel que ira pegar o nome dos estagiarios 
+    FROM ESTAGIO 											--> que ira pegar as informações da minha tabela ESTAGIO
+    WHERE ID = c_id; 										--> junto com o numero de ID de cada 
+EXCEPTION 													--> serve para que acaso aconteça uma exceção junto com o NO_DATA_FOUND é disparado um select para que mostre o erro
+    WHEN NO_DATA_FOUND THEN 
+        c_saida := 'Estagiario não encontrado';				--> caso o estagiario não for encontrado ira aparecer que não foi encontrado e mostra o codigo de erro 'sqlcode'
+END; 													    --> finaliza a procedure
+/
+
+
+																TESTE - 1
+DECLARE 						--> começamos a declarar oque nós vamos querer receber devolta do SQL
+   c_id VARCHAR2(120); 			--> o meu c_id ira conseguira armazenar até 120 caracteries 
+BEGIN 							--> ira comecar o 'corpo de pesquisa' de algum estagiario
+   COD_ESTAGIARIO(5, c_id); 	--> aqui iremos falar para o corpo que a miha procedure com o valor '5 Unknown' tem que ser retornado  
+   DBMS_OUTPUT.PUT_LINE(c_id);  --> o meu DBMS_OUTPUT.PUT_LINE em uma mensagem ira retornar qual identificação do meu estagiario foi escolhido 
+END; 							-->	finaliza o parametro de escolha
+/
+Unknown 						-->	o identificador que você escolheu o DBMS_OUTPUT.PUT_LINE ira printar na tela
+
+
+																TESTE - 2
+DECLARE 						--> começamos a declarar oque nós vamos querer receber devolta do SQL
+   c_id VARCHAR2(120);          --> o meu c_id ira conseguira armazenar até 120 caracteries 
+BEGIN                           --> ira comecar o 'corpo de pesquisa' de algum estagiario
+   COD_ESTAGIARIO(8, c_id);     --> aqui iremos falar para o corpo que a miha procedure com o valor 'Estagiario 8' tem que ser retornado  'não existe mas vamos simular'
+   DBMS_OUTPUT.PUT_LINE(c_id);  --> o meu DBMS_OUTPUT.PUT_LINE em uma mensagem ira retornar qual identificação do meu estagiario foi escolhido
+END;                            -->	finaliza o parametro de escolha
+/                               
+Estagiario nao encontrado       -->	o identificador que você escolheu o DBMS_OUTPUT.PUT_LINE ira printar na tela
+
+
+																TESTE - 3
+DECLARE							--> começamos a declarar oque nós vamos querer receber devolta do SQL
+   c_id VARCHAR2(120);          --> o meu c_id ira conseguira armazenar até 120 caracteries 
+BEGIN                           --> ira comecar o 'corpo de pesquisa' de algum estagiario
+   COD_ESTAGIARIO(NULL, c_id);  --> aqui iremos falar para o corpo que a miha procedure com o valor 'Valor NULL' tem que ser retornado  'não existe mas vamos simular'
+   DBMS_OUTPUT.PUT_LINE(c_id);  --> o meu DBMS_OUTPUT.PUT_LINE em uma mensagem ira retornar qual identificação do meu estagiario foi escolhido
+END;                            -->	finaliza o parametro de escolha
+/                               
+Estagiario nao encontrado       -->	o identificador que você escolheu o DBMS_OUTPUT.PUT_LINE ira printar na tela
+
+
+																TESTE - 4
+DECLARE							--> começamos a declarar oque nós vamos querer receber devolta do SQL
+   c_id VARCHAR2(120);          --> o meu c_id ira conseguira armazenar até 120 caracteries 
+BEGIN                           --> ira comecar o 'corpo de pesquisa' de algum estagiario
+   COD_ESTAGIARIO(-15, c_id);   --> aqui iremos falar para o corpo que a miha procedure com o valor 'Estagiario -15' tem que ser retornado  'não existe mas vamos simular'
+   DBMS_OUTPUT.PUT_LINE(c_id);  --> o meu DBMS_OUTPUT.PUT_LINE em uma mensagem ira retornar qual identificação do meu estagiario foi escolhido
+END;                            -->	finaliza o parametro de escolha
+/                               
+Estagiario nao encontrado       -->	o identificador que você escolheu o DBMS_OUTPUT.PUT_LINE ira printar na tela
+
+
+
+
+
+
+																EXERCIO 2
+CREATE TABLE PERIFERICO( 
+   ID NUMBER(4) PRIMARY KEY, 
+   NOME VARCHAR2(120) NOT NULL, 
+   PRECO NUMBER(6,2) NOT NULL,
+   CONSTRAINT UQ_NOME_PERIFERICO UNIQUE (NOME) 
+); 
+INSERT INTO PERIFERICO (ID, NOME, PRECO) VALUES (1, 'Mouse', 250.50); 
+INSERT INTO PERIFERICO (ID, NOME, PRECO) VALUES (2, 'Teclado', 20.30); 
+INSERT INTO PERIFERICO (ID, NOME, PRECO) VALUES (3, 'Fone', 45.5); 
+INSERT INTO PERIFERICO (ID, NOME, PRECO) VALUES (4, 'Notebook', 900.50); 
+INSERT INTO PERIFERICO (ID, NOME, PRECO) VALUES (5, 'Monitor', 600); 
+COMMIT;
+
+
+ira aparecer que a tabela foi criada 
+	"table created"
+	
+e as linhas inseritas
+	"1 row created"
+	
+se quiser ver se foi criado a tabela selecione ela
+	"select *
+	from PERIFERICO"
+	
+e se for adicionado ira vim com as colunas "feias" e voce pode arrumar
+	"col NOME for a50 
+	/" - aqui nesse Script ele ira arrumar a coluna NOME em até 50 caracteries para o lado
+	
+	
+	
+	
+															Criação da FUNCTION
+															
+CREATE OR REPLACE FUNCTION AUM_PERIF (C_IDPERIF IN NUMBER, C_PERC IN NUMBER)  --> ira criar uma procedure com o nome 'AUM_PERIF' que o C_IDPERIF ira ser o identificador da minha coluna 'PERIFERICO' e ira der uma variavel C_PERC que ira armazenar caso o periférico não for encontrado
+RETURN NUMBER
+IS
+   RET NUMBER := 0;  														  --> 0 para periférico encontrado, -1 para periférico não encontrado, -5 periférico fora da faixa
+   V_QTDE NUMBER;                                                             
+BEGIN                                                                         
+   IF C_IDPERIF > 0 AND C_IDPERIF <= 9999 THEN                                --> Verifica se o ID do periférico está dentro do intervalo permitido
+      IF C_PERC > 0 AND C_PERC <= 15 THEN                                     --> Verifica se o percentual está dentro da faixa permitida
+         SELECT COUNT(*) INTO V_QTDE FROM PERIFERICO WHERE ID = C_IDPERIF;    --> Verifica se o periférico com o ID fornecido existe
+         IF V_QTDE = 1 THEN                                                   
+            UPDATE PERIFERICO                                                 --> Atualiza o preço do periférico
+            SET PRECO = PRECO + (PRECO * (C_PERC / 100))                      
+            WHERE ID = C_IDPERIF;                                             
+            RET := 0;                                                         --> Retorna 0 indicando sucesso
+         ELSE                                                                 
+            RET := -1;                                                        --> Retorna -1 indicando que o periférico não foi encontrado
+         END IF;                                                              
+      ELSE                                                                    
+         RET := -5;                                                           --> Retorna -5 indicando que o percentual está fora da faixa permitida
+      END IF;                                                                 
+   ELSE                                                                       
+      RET := -1;                                                              --> Retorna -1 indicando que o periférico não foi encontrado
+   END IF;
+   COMMIT;
+   RETURN RET;
+EXCEPTION
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE('CÓDIGO DO ERRO');
+      DBMS_OUTPUT.PUT_LINE('DESCRICAO DO ERRO');
+END;
+/
+
+
+																		TESTE 1
+'ID 4 e percentual 12 (esperado: 0, preço atualizado)'
+DECLARE
+   X NUMBER;
+BEGIN
+   X := AUM_PERIF(4, 12);
+   DBMS_OUTPUT.PUT_LINE('RESULTADO DA EXECUCAO DA FUNCAO: ' || X);
+END;
+/
+RESULTADO DA EXECUCAO DA FUNCAO: 0
+
+
+																		TESTE 2
+'ID 3 e percentual 2.32 (esperado: 0, preço atualizado)'
+DECLARE
+   X NUMBER;
+BEGIN
+   X := AUM_PERIF(3, 2.32);
+   DBMS_OUTPUT.PUT_LINE('RESULTADO DA EXECUCAO DA FUNCAO: ' || X);
+END;
+/
+RESULTADO DA EXECUCAO DA FUNCAO: 0
+
+
+																		TESTE 3
+'ID 2 e percentual 20 (esperado: -5, percentual fora da faixa)'
+DECLARE
+   X NUMBER;
+BEGIN
+   X := AUM_PERIF(2, 20);
+   DBMS_OUTPUT.PUT_LINE('RESULTADO DA EXECUCAO DA FUNCAO: ' || X);
+END;
+/
+RESULTADO DA EXECUCAO DA FUNCAO: -5
+
+
+																		TESTE 4
+'ID 9 e percentual 10 (esperado: -1, periférico não encontrado)'
+DECLARE
+   X NUMBER;
+BEGIN
+   X := AUM_PERIF(9, 10);
+   DBMS_OUTPUT.PUT_LINE('RESULTADO DA EXECUCAO DA FUNCAO: ' || X);
+END;
+/
+RESULTADO DA EXECUCAO DA FUNCAO: -1
+
+
